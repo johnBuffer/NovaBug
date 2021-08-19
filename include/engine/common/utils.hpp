@@ -38,6 +38,13 @@ float getLength(sf::Vector2<T> v)
 
 
 template<typename T>
+float dot(sf::Vector2<T> v1, sf::Vector2<T> v2)
+{
+    return v1.x * v2.x + v1.y * v2.y;
+}
+
+
+template<typename T>
 sf::Vector2f toVector2f(sf::Vector2<T> v)
 {
     return {to<float>(v.x), to<float>(v.y)};

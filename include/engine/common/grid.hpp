@@ -92,12 +92,6 @@ struct Grid
 	{
 		data[y * width + x] = obj;
 	}
-    
-    template<typename Vec2Type>
-    uint32_t getID(const Vec2Type& v)
-    {
-        return v.x + width * v.y;
-    }
 
 	template<typename Vec2Type>
 	HitPoint getFirstHit(Vec2Type p, Vec2Type d, float max_dist)

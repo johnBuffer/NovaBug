@@ -4,7 +4,7 @@
 #include "../common/grid.hpp"
 
 
-constexpr uint8_t max_cell_capacity = 8;
+constexpr uint8_t max_cell_capacity = 16;
 
 
 struct CollisionCell

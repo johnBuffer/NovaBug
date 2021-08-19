@@ -14,17 +14,17 @@ struct PhysicSolver
 	// Simulation solving pass count
 	uint32_t solver_iterations;
 	uint32_t sub_steps;
-	sf::Vector2f gravity = { 0.0f, 70.0f };
-	bool even = true;
+	sf::Vector2f gravity = { 0.0f, 50.0f };
+    float frame_dt;
 
-	// 
-	float frame_dt;
+	// Parameters
+	float response_coef = 0.8f;
+	float vel_coef = 0.0025f;
 
 	PhysicSolver(uint32_t width, uint32_t height)
 		: grid(width, height)
 		, solver_iterations(1)
 		, sub_steps(2)
-		, frame_dt(1.0f)
 		, world_size(to<float>(width), to<float>(height))
 	{}
 
@@ -37,12 +37,19 @@ struct PhysicSolver
 		const sf::Vector2f o2_o1 = objects[atom_1].position - objects[atom_2].position;
 		const float dist2 = o2_o1.x * o2_o1.x + o2_o1.y * o2_o1.y;
 		if (dist2 < 1.0f) {
-			const float coef = 0.3f;
 			const float dist = sqrt(dist2);
-			const float delta = coef * (1.0f - dist);
+			const float delta = response_coef * 0.5f * (1.0f - dist);
 			const sf::Vector2f col_vec = o2_o1 / dist;
+
 			objects[atom_1].position += col_vec * delta;
 			objects[atom_2].position -= col_vec * delta;
+			
+			objects[atom_1].pressure += delta;
+			objects[atom_2].pressure += delta;
+
+			const sf::Vector2f delta_v = objects[atom_1].getVelocity() - objects[atom_2].getVelocity();
+			objects[atom_1].addVelocity(-delta_v * vel_coef);
+			objects[atom_2].addVelocity( delta_v * vel_coef);
 		}
 	}
 
@@ -95,15 +102,15 @@ struct PhysicSolver
 		new_object.index = to<uint32_t>(object_id);
 		return object_id;
 	}
-
+    
 	void update(float dt)
 	{
-		frame_dt = dt / float(sub_steps);
-		for (uint32_t i(sub_steps); i--;) {
-			addObjectsToGrid();
-			solveCollisions();
+        frame_dt = dt / float(sub_steps);
+        for (uint32_t i(sub_steps); i--;) {
+            addObjectsToGrid();
+            solveCollisions();
             updateObjects();
-		}
+        }
 	}
 
 	void addObjectsToGrid()
