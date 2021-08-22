@@ -13,6 +13,7 @@ struct PhysicObject
 	sf::Vector2f acceleration;
 	// Debug
 	float pressure = 1.0f;
+	float mass = 1.0f;
 
 	PhysicObject()
 		: index(0)
@@ -36,7 +37,7 @@ struct PhysicObject
 		position = new_position;
 		// Reset acceleration
 		acceleration = {};
-		pressure = pressure * 0.99f;
+		pressure = pressure * 0.995f;
 	}
 
 	void stop()

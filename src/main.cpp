@@ -82,12 +82,12 @@ int main()
     Renderer renderer(render_texture, engine.solver.objects);
     // Simulation parameters
     Sequence<SimulationParameters> parameters_sequence;
-    parameters_sequence.add({1.0f, 0.03f, 4000.0f, 0.005f, 3.0f},    30.0f);
+    parameters_sequence.add({0.75f, 0.01f, 4000.0f, 0.001f, 3.0f},    30.0f);
     trn::Transition<float> current_zoom = parameters_sequence.getCurrent().zoom;
 
     sf::RectangleShape fade({ window_width, window_height });
     fade.setFillColor({ 0, 0, 0, 10 });
-    const float base_force = 4000.0f;
+    const float base_force = 2000.0f;
     float current_force = base_force;
 
     GravityGrid gravity_grid;
@@ -109,18 +109,19 @@ int main()
             current_force = base_force;
             for (PhysicObject& obj : engine.solver.objects) {
                 const sf::Vector2f v = center - obj.position;
-                current_force += 10.0f / (v.x*v.x + v.y*v.y);
+                current_force += 20.0f / (v.x*v.x + v.y*v.y);
             }
             for (PhysicObject& obj : engine.solver.objects) {
                 const sf::Vector2f to_center = center - obj.position;
                 const float to_center_dist = getLength(to_center);
                 const sf::Vector2f to_center_v = to_center / to_center_dist;
-                obj.accelerate(to_center_v * (current_force / (to_center_dist * to_center_dist + 1.0f)));
+                const float attraction_force = std::max(1.0f, current_force / (to_center_dist * to_center_dist + 1.0f));
+                obj.accelerate(to_center_v * attraction_force);
             }
             engine.update(dt);
             // Air friction
             for (PhysicObject& obj : engine.solver.objects) {
-                obj.slowdown(current_parameters.drag_coef / (1.0f + obj.pressure));
+                //obj.slowdown(current_parameters.drag_coef / (1.0f + obj.pressure));
             }
         }
         // Render
