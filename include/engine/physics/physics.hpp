@@ -41,15 +41,19 @@ struct PhysicSolver
 			const float delta = response_coef * 0.5f * (1.0f - dist);
 			const sf::Vector2f col_vec = o2_o1 / dist;
 
-			objects[atom_1].position += col_vec * delta;
-			objects[atom_2].position -= col_vec * delta;
+			const float influence_sum = 1.0f / (1.0f + objects[atom_1].pressure + objects[atom_2].pressure);
+			const float influence_1 = 0.5f;//objects[atom_1].pressure * influence_sum;
+			const float influence_2 = 0.5f;//objects[atom_2].pressure * influence_sum;
+
+			objects[atom_1].position += col_vec * (delta * influence_2);
+			objects[atom_2].position -= col_vec * (delta * influence_1);
 			
-			objects[atom_1].pressure += delta;
-			objects[atom_2].pressure += delta;
+			objects[atom_1].pressure += (delta * influence_2);
+			objects[atom_2].pressure += (delta * influence_1);
 
 			const sf::Vector2f delta_v = objects[atom_1].getVelocity() - objects[atom_2].getVelocity();
-			objects[atom_1].addVelocity(-delta_v * vel_coef);
-			objects[atom_2].addVelocity( delta_v * vel_coef);
+			objects[atom_1].addVelocity(-delta_v * (vel_coef * influence_2));
+			objects[atom_2].addVelocity( delta_v * (vel_coef * influence_1));
 		}
 	}
 
