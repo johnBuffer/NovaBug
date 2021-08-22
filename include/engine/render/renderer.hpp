@@ -48,12 +48,23 @@ struct Renderer
             const float g = 10.0f * pressure;
             const float b = 1500.0f * speed;
 
-            const sf::Color color(
+            /*const sf::Color color(
                 std::max(std::min(255.0f, r), 50.0f),
                 std::max(std::min(255.0f, g), 50.0f),
                 std::max(std::min(255.0f, b), 50.0f),
                 100
-            );
+            );*/
+
+            sf::Color color = sf::Color::White;
+            if (o.mass == 2.0f) {
+                color = sf::Color::Green;
+            } else if (o.mass == 3.0f) {
+                color = sf::Color::Red;
+            } else if (o.mass == 4.0f) {
+                color = sf::Color::Blue;
+            } else if (o.mass == 5.0f) {
+                color = sf::Color::Cyan;
+            }
 
             //sf::Color color = sf::Color::White;
             const sf::Vector2f vel_v = vel / speed;

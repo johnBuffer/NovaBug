@@ -82,7 +82,7 @@ int main()
     Renderer renderer(render_texture, engine.solver.objects);
     // Simulation parameters
     Sequence<SimulationParameters> parameters_sequence;
-    parameters_sequence.add({0.75f, 0.01f, 4000.0f, 0.001f, 3.0f},    30.0f);
+    parameters_sequence.add({0.9f, 0.01f, 4000.0f, 0.01f, 3.0f},    30.0f);
     trn::Transition<float> current_zoom = parameters_sequence.getCurrent().zoom;
 
     sf::RectangleShape fade({ window_width, window_height });
@@ -115,13 +115,13 @@ int main()
                 const sf::Vector2f to_center = center - obj.position;
                 const float to_center_dist = getLength(to_center);
                 const sf::Vector2f to_center_v = to_center / to_center_dist;
-                const float attraction_force = std::max(1.0f, current_force / (to_center_dist * to_center_dist + 1.0f));
+                const float attraction_force = std::max(5.0f, current_force / (to_center_dist * to_center_dist + 1.0f));
                 obj.accelerate(to_center_v * attraction_force);
             }
             engine.update(dt);
             // Air friction
             for (PhysicObject& obj : engine.solver.objects) {
-                //obj.slowdown(current_parameters.drag_coef / (1.0f + obj.pressure));
+                obj.slowdown(current_parameters.drag_coef / (1.0f + obj.mass));
             }
         }
         // Render

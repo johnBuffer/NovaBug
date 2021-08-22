@@ -37,7 +37,7 @@ struct PhysicObject
 		position = new_position;
 		// Reset acceleration
 		acceleration = {};
-		pressure = pressure * 0.995f;
+		pressure = pressure * 0.99f;
 	}
 
 	void stop()
