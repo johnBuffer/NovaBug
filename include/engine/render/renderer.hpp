@@ -49,20 +49,21 @@ struct Renderer
             const float b = 1500.0f * speed;
 
             const sf::Color color(
-                std::max(std::min(255.0f, r), 0.0f),
-                std::max(std::min(255.0f, g), 0.0f),
-                std::max(std::min(255.0f, b), 0.0f),
+                std::max(std::min(255.0f, r), 50.0f),
+                std::max(std::min(255.0f, g), 50.0f),
+                std::max(std::min(255.0f, b), 50.0f),
                 100
             );
 
             //sf::Color color = sf::Color::White;
             const sf::Vector2f vel_v = vel / speed;
             const sf::Vector2f vel_n = { -vel_v.y, vel_v.x };
-            const float width = 1.0f + 3.0f * speed;
-            objects_va[4 * i + 0].position = o.position + width * vel_v + 0.35f * width * vel_n;
-            objects_va[4 * i + 1].position = o.position + width * vel_v - 0.35f * width * vel_n;
-            objects_va[4 * i + 2].position = o.position - width * vel_v - 0.35f * width * vel_n;
-            objects_va[4 * i + 3].position = o.position - width * vel_v + 0.35f * width * vel_n;
+            const float length = 1.0f + 3.0f * speed;
+            const float width = 0.2f * length;
+            objects_va[4 * i + 0].position = o.position + length * vel_v + width * vel_n;
+            objects_va[4 * i + 1].position = o.position + length * vel_v - width * vel_n;
+            objects_va[4 * i + 2].position = o.position - length * vel_v - width * vel_n;
+            objects_va[4 * i + 3].position = o.position - length * vel_v + width * vel_n;
 
             objects_va[4 * i + 0].color = color;
             objects_va[4 * i + 1].color = color;

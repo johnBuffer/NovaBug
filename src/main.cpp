@@ -6,6 +6,7 @@
 #include "engine/common/number_generator.hpp"
 #include "engine/common/sequence.hpp"
 #include "engine/common/transition.hpp"
+#include "gravity_grid.hpp"
 
 
 struct SimulationParameters
@@ -81,24 +82,19 @@ int main()
     Renderer renderer(render_texture, engine.solver.objects);
     // Simulation parameters
     Sequence<SimulationParameters> parameters_sequence;
-    parameters_sequence.add({0.6f, 0.0f, 47.0f, 0.01f, 1.7f},     30.0f);
-    parameters_sequence.add({1.0f, 0.02f, 42.0f, 0.01f, 3.0f},    30.0f);
-    parameters_sequence.add({0.55f, 0.01f, 70.0f, 0.0003f, 4.5f}, 25.0f);
-    parameters_sequence.add({0.7f, 0.001f, 52.0f, 0.01f, 2.5f},   20.0f);
-    parameters_sequence.add({1.1f, 0.1f, 45.0f, 0.01f, 3.5f},     30.0f);
-    parameters_sequence.add({0.8f, 0.02f, 80.0f, 0.02f, 2.8f},    30.0f);
-    parameters_sequence.add({0.45f, 0.03f, 100.0f, 0.0f, 2.5f},   20.0f);
-    parameters_sequence.add({0.8f, 0.01f, 40.0f, 0.001f, 1.5f},   30.0f);
-    parameters_sequence.add({0.45f, 0.03f, 100.0f, 0.0f, 2.5f},   20.0f);
-    parameters_sequence.add({1.01f, 0.05f, 90.0f, 0.01f, 3.8f},   30.0f);
+    parameters_sequence.add({1.0f, 0.03f, 4000.0f, 0.005f, 3.0f},    30.0f);
     trn::Transition<float> current_zoom = parameters_sequence.getCurrent().zoom;
 
     sf::RectangleShape fade({ window_width, window_height });
     fade.setFillColor({ 0, 0, 0, 10 });
+    const float base_force = 4000.0f;
+    float current_force = base_force;
+
+    GravityGrid gravity_grid;
 
     while (window.isOpen()) {
         ev_manager.processEvents();
-        vp_handler.setZoom(current_zoom);
+        //vp_handler.setZoom(current_zoom);
         // Update simulation parameters
         const SimulationParameters& current_parameters = parameters_sequence.getCurrent();
         engine.solver.response_coef = current_parameters.response_coef;
@@ -108,12 +104,18 @@ int main()
         }
         // Physics update
         if (!pause) {
-            parameters_sequence.update(dt);
+            //parameters_sequence.update(dt);
             const sf::Vector2f center = engine.solver.world_size * 0.5f;
+            current_force = base_force;
+            for (PhysicObject& obj : engine.solver.objects) {
+                const sf::Vector2f v = center - obj.position;
+                current_force += 10.0f / (v.x*v.x + v.y*v.y);
+            }
             for (PhysicObject& obj : engine.solver.objects) {
                 const sf::Vector2f to_center = center - obj.position;
-                const sf::Vector2f to_center_v = to_center / getLength(to_center);
-                obj.accelerate(to_center_v * current_parameters.force);
+                const float to_center_dist = getLength(to_center);
+                const sf::Vector2f to_center_v = to_center / to_center_dist;
+                obj.accelerate(to_center_v * (current_force / (to_center_dist * to_center_dist + 1.0f)));
             }
             engine.update(dt);
             // Air friction

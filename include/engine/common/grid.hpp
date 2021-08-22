@@ -33,7 +33,7 @@ struct Grid
 		data.resize(width * height);
 	}
 
-	int32_t mod(int32_t dividend, int32_t divisor) const
+	static int32_t mod(int32_t dividend, int32_t divisor)
 	{
 		return (dividend%divisor + divisor) % divisor;
 	}
